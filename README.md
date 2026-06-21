@@ -341,35 +341,3 @@ git push -u origin main
 ```
 
 Make the repository **public** so judges can open it. That GitHub URL is your **Source Code URL**.
-
-### 2. Deploy the live demo on Streamlit Community Cloud (free)
-
-1. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
-2. Click **Create app** → **Deploy a public app from GitHub**.
-3. Fill in:
-   - **Repository:** `<your-username>/energyshield-ntl`
-   - **Branch:** `main`
-   - **Main file path:** `dashboard/app.py`
-   - **Python version (Advanced settings):** 3.11, 3.12, or 3.13 all work.
-4. Click **Deploy**. The first load runs the pipeline on the bundled SGCC sample (about a minute), then the dashboard appears.
-
-The resulting `https://<your-app>.streamlit.app` link is your **Project Demo URL**. It is public and shareable — anyone with the link can open it.
-
-> Optional: to enable the Gemini Operations Assistant, open the app's **Settings → Secrets** on Streamlit Cloud and add:
-> ```toml
-> GEMINI_API_KEY = "your_key_here"
-> GEMINI_MODEL = "gemini-2.0-flash"
-> ```
-> Without a key, the assistant automatically falls back to the built-in operational analyst, so the demo always works.
-
-### 3. Put both links in your submission
-
-Paste the two URLs into the challenge submission form (and at the top of this README):
-
-- **Project Demo:** your `*.streamlit.app` link
-- **Source Code:** your GitHub repository link
-
-### Alternative free hosts
-
-- **Hugging Face Spaces** — create a *Streamlit* Space, push the same files, set the app file to `dashboard/app.py`.
-- **Render / Railway** — use the start command `streamlit run dashboard/app.py --server.port $PORT --server.address 0.0.0.0`.
