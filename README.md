@@ -4,8 +4,8 @@ EnergyShield AI is a Streamlit-based decision-support platform for detecting and
 
 The platform ingests smart-meter or billing datasets, cleans and standardizes them, engineers behavioral and contextual indicators, trains machine learning models, scores customers/areas/transformers, and provides an operational dashboard for analysts, administrators, and field inspectors.
 
-> **Live Demo:** Add your Streamlit Cloud URL here  
-> **Repository:** Add your GitHub repository URL here  
+> **Live Demo:** https://energyshield-ai-fuzjf6jth8cgs3rhyefh9r.streamlit.app/  
+> **Repository:** mateossharka9-droid  
 > **Status:** Prototype / hackathon demo  
 > **Important:** EnergyShield is a risk-prioritization system, not legal proof of electricity theft. Final confirmation must come from field inspection and verified evidence.
 
