@@ -1,0 +1,28 @@
+Building / Village Risk Lab - Operational Report
+================================================
+Analysis period: 2024-01-01 to 2024-06-28
+Buildings analyzed: 80
+Units analyzed: 775
+High/Critical units: 12
+High/Critical buildings: 0
+Estimated 30-day suspicious loss: 256,885 Lek
+
+Recommended operational use:
+- Use this module as a separate building/city/village investigation layer.
+- Prioritize buildings with several high-risk units before individual low-confidence cases.
+- Verify common-area meters, shared connections, meter bypass, and floor-level clusters.
+- Feed confirmed inspection outcomes back as labels for supervised calibration.
+
+Top buildings:
+- BLD-VLO-0037 (Vlore): risk 54.3, high-risk units 2/12, reason: AI outlier behavior
+- BLD-FIE-0054 (Fier): risk 46.3, high-risk units 1/7, reason: AI outlier behavior
+- BLD-PES-0023 (Peshkopi): risk 44.6, high-risk units 0/5, reason: AI outlier behavior
+- BLD-FIE-0021 (Fier): risk 44.4, high-risk units 1/9, reason: AI outlier behavior
+- BLD-TIR-0059 (Tirana): risk 42.9, high-risk units 1/10, reason: AI outlier behavior
+
+Top units:
+- BLD-PES-0061-U001: risk 80.0, probability 99.9%, reason: AI outlier behavior
+- BLD-PER-0007-U001: risk 79.2, probability 99.5%, reason: AI outlier behavior
+- BLD-TIR-0017-U009: risk 78.7, probability 99.5%, reason: estimated loss impact
+- BLD-PER-0004-U006: risk 78.6, probability 99.5%, reason: AI outlier behavior
+- BLD-TIR-0025-U005: risk 77.8, probability 100.0%, reason: estimated loss impact

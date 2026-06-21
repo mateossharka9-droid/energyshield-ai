@@ -1,0 +1,16 @@
+{
+  "source": "Building/Village Risk Lab",
+  "records": 139500,
+  "units": 775,
+  "buildings": 80,
+  "positive_units": 92,
+  "fraud_classifier_roc_auc": 1.0,
+  "fraud_classifier_average_precision": 1.0,
+  "high_risk_units": 12,
+  "critical_units": 0,
+  "high_risk_buildings": 0,
+  "estimated_loss_lek_30d": 256885.06500000003,
+  "date_min": "2024-01-01",
+  "date_max": "2024-06-28",
+  "scoring_method": "Hybrid: expected-consumption deviation + peer comparison + meter behavior + weather mismatch + IsolationForest, with supervised probability if labels exist."
+}
