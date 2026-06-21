@@ -2,7 +2,7 @@
 
 EnergyShield AI is a professional prototype platform for detecting and prioritizing non-technical electricity losses (NTL): suspicious consumption, meter tampering signals, illegal-connection indicators, abnormal billing/reading behavior, and geographic anomaly clusters.
 
-> **Live demo:** `<paste your Streamlit Cloud URL here>`
+> **Live demo:** `https://energyshield-ai-fuzjf6jth8cgs3rhyefh9r.streamlit.app/`
 > **Source code:** `<paste your GitHub repository URL here>`
 >
 > See [Deploy online and submit](#deploy-online-and-submit-challenge-submission) for step-by-step publishing instructions.
@@ -255,25 +255,6 @@ outputs/workspace/activity_log.json      # cross-department live activity
 outputs/workspace/summary_requests.json  # admin -> analyst request/response queue
 ```
 
-## API key / assistant behavior
-
-The dashboard does **not** require a Gemini key. If no key exists, the Operations Assistant uses a built-in operational analyst mode instead of crashing.
-
-To enable Gemini later, set one of these:
-
-```bash
-set GEMINI_API_KEY=your_key_here      # Windows CMD
-$env:GEMINI_API_KEY="your_key_here"   # PowerShell
-export GEMINI_API_KEY=your_key_here   # macOS/Linux
-```
-
-or create:
-
-```text
-.streamlit/secrets.toml
-```
-
-using `.streamlit/secrets.example.toml` as the template.
 
 ## Production notes
 
