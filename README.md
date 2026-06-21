@@ -1,122 +1,223 @@
 # EnergyShield AI — Weather-Aware NTL Detection Platform
 
-EnergyShield AI is a professional prototype platform for detecting and prioritizing non-technical electricity losses (NTL): suspicious consumption, meter tampering signals, illegal-connection indicators, abnormal billing/reading behavior, and geographic anomaly clusters.
+EnergyShield AI is a Streamlit-based decision-support platform for detecting and prioritizing **non-technical electricity losses (NTL)** such as suspicious consumption drops, meter tampering patterns, illegal-connection indicators, abnormal billing behavior, and geographic risk clusters.
 
-> **Live demo:** `https://energyshield-ai-fuzjf6jth8cgs3rhyefh9r.streamlit.app/`
-> **Source code:** `<paste your GitHub repository URL here>`
->
-> See [Deploy online and submit](#deploy-online-and-submit-challenge-submission) for step-by-step publishing instructions.
+The platform ingests smart-meter or billing datasets, cleans and standardizes them, engineers behavioral and contextual indicators, trains machine learning models, scores customers/areas/transformers, and provides an operational dashboard for analysts, administrators, and field inspectors.
 
-It covers the challenge requirements:
+> **Live Demo:** Add your Streamlit Cloud URL here  
+> **Repository:** Add your GitHub repository URL here  
+> **Status:** Prototype / hackathon demo  
+> **Important:** EnergyShield is a risk-prioritization system, not legal proof of electricity theft. Final confirmation must come from field inspection and verified evidence.
 
-- historical consumption analysis
-- automatic anomaly detection
-- customer, area, and transformer risk scores
-- interactive dashboard visualization
-- explanations for each alert
-- map of high-anomaly areas
-- inspection-priority workflow
-- weather/context features that reduce false positives
+---
 
-## Core workflow
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Problem Statement](#problem-statement)
+- [Main Features](#main-features)
+- [How the Platform Works](#how-the-platform-works)
+- [Machine Learning Models](#machine-learning-models)
+- [Risk Score Logic](#risk-score-logic)
+- [Supported Dataset Formats](#supported-dataset-formats)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Run the Platform Locally](#run-the-platform-locally)
+- [Demo Accounts](#demo-accounts)
+- [Generated Outputs](#generated-outputs)
+- [Model Evaluation](#model-evaluation)
+- [Gemini Operations Assistant](#gemini-operations-assistant)
+- [Deployment](#deployment)
+- [Limitations](#limitations)
+- [Future Improvements](#future-improvements)
+- [Author](#author)
+
+---
+
+## Project Overview
+
+EnergyShield AI helps electricity distribution operators identify where non-technical losses may be happening and prioritize the most important inspection cases.
+
+The platform combines:
+
+- Historical consumption analysis
+- Unsupervised anomaly detection
+- Supervised fraud classification when labels exist
+- Expected consumption prediction
+- Weather-aware demand context
+- Peer group comparison
+- Geographic and transformer-level risk concentration
+- Billing and payment behavior indicators
+- Inspection priority ranking
+- Forecasting of suspicious loss pressure
+- Role-based dashboards for Admin, Analyst, and Inspector users
+
+The goal is to support faster, more data-driven operational decisions for electricity loss reduction.
+
+---
+
+## Problem Statement
+
+Electricity distribution companies lose revenue because of non-technical losses, including meter tampering, illegal connections, billing manipulation, and unregistered consumption. Traditional inspection methods are often manual, reactive, and expensive.
+
+EnergyShield AI solves this by ranking customers and areas according to risk, so field teams can focus on the most suspicious and financially important cases first.
+
+---
+
+## Main Features
+
+### 1. Data Intake and Cleaning
+
+- Upload smart-meter, billing, or SGCC/STEG-style datasets.
+- Automatically detect dataset schema.
+- Convert wide-format meter readings into long analytical format.
+- Clean invalid dates, missing values, duplicate records, negative readings, and extreme outliers.
+- Produce an ingestion report and data-readiness score.
+
+### 2. Customer Risk Scoring
+
+Each customer receives:
+
+- Final risk score from 0 to 100
+- Risk level: Low, Medium, High, or Critical
+- AI anomaly score
+- Fraud probability when labels are available
+- Estimated missing consumption
+- Estimated 30-day revenue loss
+- Main reason for the alert
+- Recommended inspection action
+
+### 3. Area and Transformer Analysis
+
+The platform aggregates individual customer scores into:
+
+- Area risk scores
+- Transformer risk scores
+- Geographic anomaly clusters
+- Hotspot maps
+- Inspection route files
+
+### 4. Weather-Aware Analysis
+
+EnergyShield uses weather context to reduce false positives. For example, high electricity usage during hot or cold days may be normal, while very low consumption during high-demand weather can be suspicious.
+
+Weather features include:
+
+- Mean temperature
+- Minimum and maximum temperature
+- Heating degree days
+- Cooling degree days
+- Weather demand pressure
+- Cold / normal / hot classification
+- Weather-consumption mismatch flags
+
+### 5. Billing and Payment Risk
+
+The platform can include operational payment indicators such as:
+
+- Late payments in the last 12 months
+- Unpaid bills
+- Average payment delay
+- Arrears amount
+- Disconnections
+- Months since last payment
+- Account status
+- Payment risk score
+
+These are not treated as proof of fraud, but they are useful supporting indicators for inspection prioritization.
+
+### 6. Forecasting
+
+EnergyShield generates short-term forecasts for:
+
+- Customer risk pressure
+- Area risk pressure
+- Estimated suspicious revenue loss
+- Next 30-day operational priority
+
+### 7. Role-Based Dashboard
+
+The platform includes three operational roles:
+
+- **Admin / Operations:** Upload data, run analysis, dispatch inspection duties, view all dashboards.
+- **Data Analyst:** Review model quality, answer summary requests, inspect statistical results.
+- **Field Inspector:** View assigned duties only, inspect customers, and report outcomes.
+
+---
+
+## How the Platform Works
 
 ```text
-Electricity dataset upload
+Raw electricity dataset
         ↓
-Schema detection/adaptation
+Schema detection and format adaptation
         ↓
-Cleaning and standardization
+Data cleaning and standardization
         ↓
-Weather and operational context merge
+Weather, GIS, transformer, and billing context enrichment
         ↓
-Customer behavior feature engineering
+Customer-level feature engineering
         ↓
-Peer comparison + geographic concentration
+Expected consumption prediction
         ↓
-Isolation Forest anomaly model
+Isolation Forest anomaly detection
         ↓
-Optional class-balanced fraud classifier if labels exist
+Optional supervised fraud classification
         ↓
-Risk score + alert explanation + inspection action
+Customer, area, and transformer risk scoring
         ↓
-Dashboard, map, forecasts, reports, and case register
+Inspection priority ranking
+        ↓
+Dashboard, map, reports, forecasts, and case management
 ```
 
-## Supported dataset formats
-
-### 1. SGCC wide smart-meter data
-
-```text
-UserId | IsStealer | 1/1/2014 | 1/2/2014 | ...
-CONS_NO | FLAG | 2014/1/1 | 2014/1/2 | ...
-```
-
-This is the preferred format for daily electricity theft/anomaly detection.
-
-### 2. Long smart-meter data
+The internal canonical format used by the platform is:
 
 ```text
 customer_id | date | consumption_kwh | fraud_label(optional)
 ```
 
-Optional fields are used automatically when available:
+Additional columns such as `area_id`, `transformer_id`, `latitude`, `longitude`, `customer_type`, `meter_age`, and `contract_power_kw` are used when available.
 
-```text
-area_id, transformer_id, latitude, longitude, city,
-customer_type, meter_age, contract_power_kw
-```
+---
 
-### 3. STEG invoice/billing fraud ZIP
+## Machine Learning Models
 
-The platform supports the public STEG fraud dataset structure:
+EnergyShield uses standard machine learning algorithms from `scikit-learn`. The algorithms are not invented from scratch, but the models are trained/fitted inside the platform using the uploaded or prepared electricity dataset.
 
-```text
-client_train.csv + invoice_train.csv
-client_test.csv + invoice_test.csv
-```
+### 1. Expected Consumption Model
 
-It joins customers and invoices, converts invoice rows into `customer_id / date / consumption_kwh / fraud_label`, and normalizes invoice consumption by `months_number`. This source is useful for fraud classification and billing-pattern analysis, but SGCC-style data is stronger for daily smart-meter anomaly detection.
+**Algorithm:** Random Forest Regressor  
+**Saved model:** `models/expected_consumption_model.pkl`
 
-## Weather context
+This model predicts what a customer's normal recent consumption should be based on historical baseline, peer behavior, contract power, meter age, and weather context.
 
-The project includes a generated Albania daily weather dataset:
+The platform compares expected consumption with actual consumption to calculate an expected-deviation signal.
 
-```text
-data/raw/albania_weather_daily_2014_2016.csv
-```
+### 2. Anomaly Detection Model
 
-Weather columns include:
+**Algorithm:** Isolation Forest  
+**Saved model:** `models/isolation_forest_model.pkl`
 
-```text
-temp_mean, temp_min, temp_max, precipitation_mm,
-weather_class, is_cold, is_hot, weather_demand_pressure,
-heating_degree_days, cooling_degree_days
-```
+This is an unsupervised model. It can detect suspicious behavior even when the dataset does not contain fraud labels.
 
-Weather classification:
+It looks for unusual customers based on consumption behavior, peer deviation, weather mismatch, payment risk, and other engineered features.
 
-```text
--1 = cold
- 0 = normal
- 1 = hot
-```
+### 3. Fraud Classification Model
 
-The model does **not** treat weather as proof of fraud. It uses weather as context. For example, high consumption during hot/cold periods can be normal, while very low consumption during high-demand weather can increase inspection priority.
+**Algorithm:** Random Forest Classifier  
+**Saved model:** `models/fraud_classifier.pkl`
 
-## Model design
+This model is trained only when the dataset contains valid fraud labels. It predicts the probability that a customer belongs to the suspicious/fraud class.
 
-EnergyShield uses a multi-signal decision-support model:
+If labels are not available, the platform still works using the unsupervised anomaly model and rule-based risk indicators.
 
-1. **Historical deviation** — drops, spikes, zero readings, flatlines, recent vs previous baseline.
-2. **Peer comparison** — compares customers with similar profiles and consumption bands.
-3. **Expected consumption model** — Random Forest regressor estimates expected recent usage.
-4. **Unsupervised anomaly detection** — Isolation Forest finds unusual customer behavior.
-5. **Supervised fraud probability** — class-balanced Random Forest classifier is trained when labels exist.
-6. **Geographic concentration** — area and transformer anomaly density.
-7. **Weather mismatch** — checks whether consumption behavior matches cold/hot demand expectations.
-8. **Billing / payment behavior** — late payments, unpaid bills, arrears, average payment delay, non-payment disconnections, and dormant accounts. Chronic payment irregularity is a strong real-world NTL trigger and is fed into both the risk score and the supervised classifier.
+---
 
-Final risk score weighting:
+## Risk Score Logic
+
+The final customer risk score is a weighted combination of multiple signals:
 
 ```text
 26% AI combined score
@@ -125,13 +226,8 @@ Final risk score weighting:
 13% geographic risk
  8% sudden behavior flags
  8% weather context
- 8% billing / payment behavior
+ 8% billing/payment behavior
 ```
-
-Payment-behavior fields (`payment_late_count_12m`, `unpaid_bills`, `avg_payment_delay_days`,
-`arrears_amount_lek`, `disconnections_12m`, `months_since_last_payment`, `payment_method`,
-`account_status`) are read from the uploaded dataset when present, and otherwise generated as a
-realistic billing/collection profile so the signal is always available in the prototype.
 
 Risk levels:
 
@@ -142,7 +238,130 @@ Risk levels:
 81–100    Critical
 ```
 
-## Run locally
+The platform also calculates an inspection priority score that combines risk, estimated loss value, and geographic concentration. This helps operations teams decide which cases should be inspected first.
+
+---
+
+## Supported Dataset Formats
+
+### 1. SGCC Wide Smart-Meter Format
+
+One row per customer and one column per day.
+
+```text
+UserId | IsStealer | 1/1/2014 | 1/2/2014 | 1/3/2014 | ...
+```
+
+or:
+
+```text
+CONS_NO | FLAG | 2014/1/1 | 2014/1/2 | 2014/1/3 | ...
+```
+
+### 2. Long Smart-Meter Format
+
+```text
+customer_id | date | consumption_kwh | fraud_label(optional)
+```
+
+Optional columns:
+
+```text
+area_id, transformer_id, latitude, longitude, city,
+customer_type, meter_age, contract_power_kw
+```
+
+### 3. STEG Invoice/Billing Fraud ZIP
+
+The platform can also process STEG-style billing fraud datasets:
+
+```text
+client_train.csv + invoice_train.csv
+client_test.csv + invoice_test.csv
+```
+
+Invoices are converted into the internal customer/date/consumption format.
+
+---
+
+## Tech Stack
+
+- **Python** — core programming language
+- **Pandas / NumPy** — data cleaning and transformation
+- **Scikit-learn** — machine learning models
+- **Streamlit** — interactive web dashboard
+- **Plotly** — charts and visual analytics
+- **Folium / Streamlit-Folium** — maps and geospatial visualization
+- **Joblib** — model saving/loading
+- **OpenPyXL** — Excel support
+- **Google Gemini API** — optional operations assistant
+
+---
+
+## Project Structure
+
+```text
+EnergyShield-NTL-Platform/
+│
+├── dashboard/
+│   └── app.py                         # Main Streamlit dashboard
+│
+├── data/
+│   └── raw/                           # Sample datasets and weather data
+│
+├── models/                            # Trained model files (.pkl)
+│   ├── expected_consumption_model.pkl
+│   ├── isolation_forest_model.pkl
+│   └── fraud_classifier.pkl
+│
+├── outputs/                           # Generated analysis outputs
+│
+├── src/
+│   ├── data_ingestion.py              # Schema detection and cleaning
+│   ├── feature_engineering.py         # Feature extraction and indicators
+│   ├── modeling.py                    # ML model training
+│   ├── risk_scoring.py                # Final risk scores
+│   ├── forecasting.py                 # Forecasting logic
+│   ├── geospatial.py                  # Map and GIS outputs
+│   ├── weather_features.py            # Weather context processing
+│   ├── explainability.py              # Human-readable explanations
+│   ├── gemini_assistant.py            # Optional AI assistant
+│   └── pipeline.py                    # End-to-end pipeline orchestration
+│
+├── run_pipeline.py                    # CLI pipeline runner
+├── requirements.txt                   # Python dependencies
+├── MODEL_CARD.md                      # Model explanation and limitations
+├── data_dictionary.md                 # Input/output field definitions
+├── PLATFORM_GUIDE.md                  # Full platform documentation
+└── README.md                          # Project overview
+```
+
+---
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git
+cd YOUR_REPOSITORY_NAME
+```
+
+Create a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Activate it:
+
+```bash
+# Windows
+.venv\Scripts\activate
+
+# macOS/Linux
+source .venv/bin/activate
+```
 
 Install dependencies:
 
@@ -150,94 +369,47 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Run the included SGCC-style sample with Albania weather context:
+---
+
+## Run the Platform Locally
+
+Run the data pipeline with the included sample dataset:
 
 ```bash
 python run_pipeline.py --input data/raw/selected_smart_grid_theft_sample.csv --weather data/raw/albania_weather_daily_2014_2016.csv --max-customers 1200 --max-days 730
 ```
 
-Launch the dashboard:
+Start the Streamlit dashboard:
 
 ```bash
 streamlit run dashboard/app.py
 ```
 
-Sign in with a demo account (see [Roles and departments](#roles-and-departments-multi-user)) — for example `admin` / `oshee123`.
+Then open the local Streamlit URL shown in your terminal.
 
-Windows shortcut:
+---
 
-```bat
-run_demo.bat
-```
+## Demo Accounts
 
-Linux/macOS shortcut:
-
-```bash
-bash run_demo.sh
-```
-
-## Run with STEG invoice fraud ZIP
-
-```bash
-python run_pipeline.py --input "path/to/archive.zip" --max-customers 1000 --max-days 730
-```
-
-For the uploaded `archive (12).zip`, the platform detects the STEG structure automatically and adapts it into the internal format.
-
-## Roles and departments (multi-user)
-
-The platform opens with a **department sign in**. Each role sees only the features it needs, and the three departments work on the same live data, so changes flow between them in near real time (file-backed shared state with auto-refreshing panels).
-
-Demo accounts (password `oshee123` for all):
+All demo accounts use the same password:
 
 ```text
-admin       Administration & Operations
-analyst     Data Analytics Office
-inspector1  Field Inspection — Team 1
-inspector2  Field Inspection — Team 2
-inspector3  Field Inspection — Team 3
+Password: oshee123
 ```
 
-| Role | Can do | Cannot do |
-| --- | --- | --- |
-| **Admin** (OSHEE Operations) | Upload datasets and run analysis, see all dashboards and indicators, **dispatch inspection duties** to field teams, **request a summary** from the analyst, manage cases, export reports | — |
-| **Analyst** (Data Analytics Office) | See statistical results and model quality, **answer the admin's summary requests** (auto-drafted from the data, editable), review risk register / forecasts / governance | Upload data, dispatch duties |
-| **Inspector** (Field Inspection Team) | See **only the duties dispatched to their team** (live), investigate the customer, and **report the outcome** back to admin | See other teams, upload data, change the model |
+| Username | Role |
+|---|---|
+| `admin` | Administration & Operations |
+| `analyst` | Data Analytics Office |
+| `inspector1` | Field Inspection Team 1 |
+| `inspector2` | Field Inspection Team 2 |
+| `inspector3` | Field Inspection Team 3 |
 
-Real-time flow:
+---
 
-```text
-Admin uploads data and runs analysis  →  scores update for everyone
-Admin dispatches duties to a team      →  that team's board updates live
-Inspector reports an outcome           →  appears in the admin live activity feed
-Admin requests a summary               →  analyst inbox updates; analyst replies; admin sees the response
-```
+## Generated Outputs
 
-A live status strip (data freshness + pending requests + latest action) and a cross-department activity feed give the real-time experience without a page reload.
-
-## Dashboard pages
-
-**Admin**
-
-- **Admin Console** — plain-language briefing (how many customers are suspicious, how much money is at risk, where to focus), the **Revenue Loss Indicator** headline (expected vs. actually-recorded revenue and the suspicious gap), one-click duty dispatch, analyst summary requests, and a live coordination feed.
-- **Command Center** — overall NTL risk, suspicious customers, key hotspots, and the full **Revenue Loss Indicator**: an expected-vs-actual revenue waterfall plus the top loss-contributing areas, all valued at the ERE/OSHEE tariff bands.
-- **Data Intake** — upload SGCC, STEG, or long smart-meter data and run the pipeline.
-- **Risk Register / Customer 360 / Geographic View / Weather Context / Building Risk Lab / Forecasting** — investigation and planning views.
-- **Case Management** — assign/track inspection cases and verification status.
-- **Reports / Operations Assistant** — management exports and the AI assistant.
-
-**Analyst**
-
-- **Analyst Workspace** — key statistical fields and the request inbox to answer admin summaries in real time.
-- **Model Governance** — validation metrics, top-k inspection quality, and correlation analysis.
-- **Risk Register / Customer 360 / Weather Context / Forecasting / Building Risk Lab / Reports / Assistant** — read access for analysis.
-
-**Inspector**
-
-- **My Inspections** — live board of duties dispatched to the inspector's team, with the reason, location, recommended check, and an outcome-reporting form.
-- **Customer 360 / Geographic View** — context for the assigned customer and its location.
-
-## Output files
+After running the pipeline, the platform creates output files such as:
 
 ```text
 outputs/customer_risk_scores.csv
@@ -251,74 +423,135 @@ outputs/inspection_route.geojson
 outputs/ingestion_report.json
 outputs/model_metrics.json
 outputs/pipeline_summary.json
-outputs/workspace/activity_log.json      # cross-department live activity
-outputs/workspace/summary_requests.json  # admin -> analyst request/response queue
 ```
 
+These files are used by the dashboard for visualization, reports, maps, and inspection workflows.
 
-## Production notes
+---
 
-For a real electricity distribution operator, replace prototype fields with:
+## Model Evaluation
 
-- real AMI/smart-meter readings
-- meter registry and customer contract data
-- transformer topology and GIS coordinates
-- inspection outcomes and confirmed NTL labels
-- real historical weather feed from Open-Meteo, Meteostat, NASA POWER, or national meteorological stations
-- role-based access control and audit logs
+When fraud labels are available, the platform reports metrics such as:
 
-EnergyShield is a decision-support system. Field inspection and verified evidence remain the final confirmation step.
+- ROC AUC
+- Average precision
+- Precision at top 10 percent
+- Recall at top 10 percent
+- Holdout positive rate
 
-## Building / Village Risk Lab
+For the expected consumption model, the platform reports:
 
-This version includes an independent sidebar module named **Building Risk Lab**. It does not change the main SGCC/customer NTL pipeline.
+- Mean Absolute Error (MAE)
 
-The module can:
-
-- Generate an Albania building/apartment/village consumption dataset with floors, unit metadata, city/village context, meter type, weather context, and hidden fraud patterns.
-- Upload CSV/XLSX/ZIP building datasets.
-- Score risk per apartment/unit, floor, and building.
-- Estimate fraud probability and 30-day suspicious loss.
-- Visualize building consumption against expected demand.
-- Show a heatmap and marker map of high-risk buildings.
-- Export unit scores, building scores, floor scores, and an operational report.
-
-Recommended upload schema:
+These metrics are stored in:
 
 ```text
-date, city, location_type, building_id, building_type, floor, unit_id, unit_type,
-household_size, area_sqm, meter_type, connection_type, contracted_power_kw,
-latitude, longitude, expected_kwh, consumption_kwh, fraud_label
+outputs/model_metrics.json
 ```
 
-Only these fields are mandatory:
+```
+
+For Streamlit Cloud, add the key in **App Settings → Secrets**:
+
+```toml
+GEMINI_API_KEY = "your_key_here"
+GEMINI_MODEL = "gemini-2.0-flash"
+```
+
+Do not commit real API keys to GitHub.
+
+---
+
+## Deployment
+
+The easiest deployment option is **Streamlit Community Cloud**.
+
+1. Push the project to GitHub.
+2. Go to Streamlit Community Cloud.
+3. Select the GitHub repository.
+4. Set the main file path to:
 
 ```text
-date, building_id, unit_id or customer_id, consumption_kwh
+dashboard/app.py
 ```
 
-The scoring approach combines expected-consumption deviation, peer comparison, meter behavior, weather-consumption mismatch, AI outlier detection, estimated loss impact, and supervised probability when labels exist.
+5. Deploy the app.
 
-## Guided start (optional)
+Optional Streamlit Cloud settings:
 
-When the platform opens for the first time it shows a short, optional **Guided Start**. The worker picks a role (Distribution Operator, Field Inspector, or Analytical/Operational Team) and what they want to do first, and the platform opens the matching workspace. It can always be skipped with **Skip and explore on my own**, and reopened anytime from the sidebar **Guided start** button. The guided start only changes which page opens — it never changes the data or the AI model.
-
-## Deploy online and submit (challenge submission)
-
-The submission needs two links: a **Project Demo URL** (a place where judges can use the live app) and a **Source Code URL** (where judges can read the code). The fastest free way to get both is GitHub + Streamlit Community Cloud.
-
-### 1. Publish the source code on GitHub
-
-Use the `EnergyShield-NTL-Platform` folder as the repository root so `requirements.txt` sits at the top level.
-
-```bash
-cd EnergyShield-NTL-Platform
-git init
-git add .
-git commit -m "EnergyShield AI — NTL detection platform"
-git branch -M main
-git remote add origin https://github.com/<your-username>/energyshield-ntl.git
-git push -u origin main
+```text
+Python version: 3.11 or newer
+Main file: dashboard/app.py
 ```
 
-Make the repository **public** so judges can open it. That GitHub URL is your **Source Code URL**.
+---
+
+## Important GitHub Security Note
+
+Before pushing to GitHub, make sure these files are not committed:
+
+```text
+.streamlit/secrets.toml
+.env
+__pycache__/
+*.pyc
+```
+
+The repository should include `.streamlit/secrets.example.toml`, but not the real `secrets.toml` file.
+
+Recommended `.gitignore` entries:
+
+```gitignore
+__pycache__/
+*.pyc
+.env
+.streamlit/secrets.toml
+.DS_Store
+```
+
+You may also exclude generated outputs and trained models if you want a cleaner repository:
+
+```gitignore
+outputs/*.csv
+outputs/*.json
+outputs/*.geojson
+models/*.pkl
+```
+
+---
+
+## Limitations
+
+- The platform is a prototype and should not be used as legal proof of fraud.
+- Public datasets may not perfectly represent Albanian electricity distribution behavior.
+- Synthetic GIS, customer metadata, weather, and payment fields should be replaced with real operational data in production.
+- Model results depend heavily on input data quality.
+- Final decisions should always involve human review and field verification.
+
+---
+
+## Future Improvements
+
+- Connect to real OSHEE smart-meter and billing systems.
+- Add real-time data streaming from meters.
+- Improve authentication and access control.
+- Add inspection feedback loops for continuous model retraining.
+- Add SHAP explainability for model-level feature contribution.
+- Add more advanced time-series forecasting models.
+- Integrate real GIS feeder/transformer topology.
+- Add audit logs and production-grade monitoring.
+
+---
+
+## Author
+
+**Mateos Sharka**  
+Artificial Intelligence Student  
+GitHub: `@mateossharka9`  
+Project: EnergyShield AI — Non-Technical Loss Detection Platform
+
+---
+
+## Acknowledgement
+
+This project was built as a prototype for demonstrating how data science, machine learning, and operational analytics can support electricity-loss detection and inspection prioritization.
